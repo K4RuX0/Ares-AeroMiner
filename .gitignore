@@ -36,14 +36,12 @@ ENV/
 # Ambiente e chaves
 .env
 .env.local
-.env.*.local
 *.pem
 *.key
 
 # Sistema operacional
 .DS_Store
 Thumbs.db
-ehthumbs.db
 Desktop.ini
 
 # Projeto ARES-STARSHIP V3.1
@@ -52,10 +50,8 @@ Desktop.ini
 *.stp
 *.stl
 *.obj
-*.fbx
 *.blend
 *.dwg
-*.dxf
 
 # Simulações CFD/FEA/NTR
 simulations/
@@ -67,7 +63,6 @@ logs/
 *.vtu
 *.cas
 *.dat
-*.plt
 
 # Dados de trajetória e telemetria
 *.csv
@@ -83,13 +78,8 @@ renders/
 *.mov
 *.exr
 
-# Documentos compilados
-*.pdf
-*.docx
-!docs/*.pdf
-
 # Temporários
 *.log
 *.tmp
 temp/
-tmp/ 
+tmp/
