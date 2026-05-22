@@ -124,7 +124,7 @@ Ask: $22M Seed Funding -> TRL-4 170kN demonstrator + 4x cluster CFD in 18mo
 Milestone: 300s hot-fire validation with NASA/DOE labs
 
 Contact: Ranyellson Quintão
-ranyellson@gmail.com | +55 31 98837-8286"""
+ranyellson@gmail.com"""
             with open("03_INVESTOR_PITCH_V3.1.txt", "w") as file_pitch:
                 file_pitch.write(pitch)
 
