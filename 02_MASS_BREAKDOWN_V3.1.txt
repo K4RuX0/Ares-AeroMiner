@@ -1,7 +1,7 @@
 ARES-STARSHIP V3.1 - MASS BREAKDOWN - Prometheus I Optimized Mission
 
-LAUNCHPAD TOTAL: 1455.3 t
-Dry Mass: 215.6 t
+LAUNCHPAD TOTAL: 1452.7 t
+Dry Mass: 199.4 t
 Propellant LH2: 1127.0 t
 T/W RATIO: 0.51 (BALANCED SPACE TRANSIT CONFIGURATION)
 Total Height: 84.6 m
@@ -12,8 +12,8 @@ Mission Duration: 776 days | Crew: 6
 Habitat Volume: 380 m³ | 63 m³/crew
 
 Key Ratios:
-- Propellant Fraction: 77.4%
+- Propellant Fraction: 77.6%
 - Shielding Matrix: 20 g/cm² PE+H2O
 - Transit Window: 125 days to Mars (Optimized Flow Profile)
-- Tank Volume: 15903 m³ LH2 @ 70.85 kg/m³
-- Engine-Out T/W: 0.38 (3 engines, abort to LEO capable)
+- Tank Volume: 15905 m³ LH2 @ 70.85 kg/m³
+- Engine-Out T/W: 0.38 (3 engines, abort capable)
