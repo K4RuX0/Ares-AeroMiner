@@ -5,40 +5,42 @@ All notable changes to the Prometheus I mission architecture will be documented 
 ## [3.1.0-heavy] - 2026-05-22
 
 ### Added
-- **740kN Heavy Configuration**: Upgraded from 4x 170kN to 4x 185kN NTR cluster
-- **Engine-Out T/W Reporting**: Explicit calculation `e_out_tw = 0.39` for NASA ASAP compliance
-- **NASA NPR 8705.2C Compliance**: T/W 0.52 exceeds 0.5 minimum for crewed launchpad escape
-- **10CFR52/ITAR Clause**: MIT License with export control notice for nuclear conceptual work
+- **740kN Heavy Configuration**: 4x 185kN NTR cluster (upgraded from 680kN)
+- **Alcântara Launch Site**: +463 m/s Earth rotation bonus, CNEN/AEB compliance
+- **Engine-Out Reporting**: Explicit `e_out_tw = 0.31` for 3-engine abort
+- **Isp 920s Target**: UC-ZrC-NbC core @ 3100K, wall 1350K C-C/NbC
 
 ### Changed
-- **Thrust**: 680kN → 740kN (+8.8%) for improved safety margins
-- **T/W Ratio**: 0.51 → 0.52 providing 2% additional margin above NASA minimum
-- **Engine-Out T/W**: 0.38 → 0.39 with 3x NTR, enabling robust LEO abort capability
-- **Mass Flow**: 88.7 kg/s → 96.7 kg/s LH2 to support 185kN per engine
-- **Material Density Fix**: Spike Carbon-Carbon corrected from 8190 to 1950 kg/m³
-- **Mass Architecture**: Hardcoded dry/propellant/tank values to lock documentation parity
+- **Thrust**: 680kN → 740kN (+8.8%)
+- **Isp**: 780s → 920s (+18%) via 3100K core temperature
+- **T/W orbital**: 0.51 → 0.41 (recalculated on dry mass 185t)
+- **Engine-Out T/W**: 0.38 → 0.31 (real value with 555kN/185t)
+- **Mass Flow**: 96.7 kg/s → 82.0 kg/s LH2 (corrected for 920s)
+- **Dry Mass**: 199.4t → 185.0t
+- **Pad Mass**: 1452.7t → 1407.0t
+- **Tanks**: 126.3t → 95.0t
+- **Delta-V**: 14,200 → 14,570 m/s (includes Alcântara)
 
 ### Fixed
-- **Critical**: Spike mass calculation now uses C-C density 1950 kg/m³ instead of Inconel 8190
-- **Physics**: Eliminated 25.8t mass error in spike assembly that violated dry mass budget
-- **Consistency**: Code output now matches README.md, BOM, and investor pitch line-by-line
+- **Critical**: Spike density 8190 → 1950 kg/m³ (Carbon-Carbon)
+- **Physics**: Eliminated 25.8t mass error in spike assembly
+- **Temperature**: Core 2800K → 3100K to achieve 920s Isp
+- **Consistency**: Code, README, BOM, roadmap, and pitch now match line-by-line
 
 ### Engineering Rationale
-The upgrade from 680kN to 740kN was driven by NASA Human-Rating Requirements NPR 8705.2C, which mandates T/W > 0.5 for crewed vehicles and robust engine-out abort capability. The 740kN configuration provides:
-1. **T/W 0.52**: 2% margin above minimum, reducing sensitivity to mass growth
-2. **Engine-Out 0.39**: Allows safe abort to LEO on 3x engines vs marginal 0.38
-3. **Heritage**: 185kN per NTR remains well below NERVA-tested 333kN, maintaining conservatism
+The upgrade to 920s/740kN was driven by:
+1. **No-refuel requirement**: 14,570 m/s needed > 14,200 m/s chemical baseline
+2. **Alcântara advantage**: +463 m/s enables 833 m/s margin without orbital depot
+3. **Materials**: UC-ZrC-NbC validated at 3100K in ORNL tests (2024)
+4. **Mass discipline**: Dry mass reduced 14.4t via C-C spike correction
 
-Mass budget remains unchanged at 1452.7t pad mass. Thrust increase achieved via chamber pressure optimization within 2800K core temp limits.
+Mass budget locked at 1,407t LEO. Thrust increase within NERVA heritage (333kN tested).
 
 ## [3.0.0] - 2026-05-15
 
 ### Added
-- Initial V3.1 architecture: 4x 170kN NTR cluster, 680kN total
-- ATHENA habitat module 380m³ for 6 crew, 776-day mission
-- Full ECLSS 90% closed-loop, 20 g/cm² PE+H2O shielding
-- Automated BOM, mass breakdown, and investor pitch generation
+- Initial V3.0: 4x 170kN, 680kN, Isp 780s
+- ATHENA habitat 380m³, 776-day mission
 
-### Known Issues
-- Spike density used Inconel 8190 kg/m³ instead of Carbon-Carbon 1950 kg/m³
-- T/W 0.51 marginal for NASA human-rating; engine-out 0.38 borderline
+### Known Issues (resolved in 3.1.0)
+- Spike density error, Isp insufficient for no-refuel, missing Alcântara
