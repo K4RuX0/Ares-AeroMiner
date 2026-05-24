@@ -1,3 +1,96 @@
+# -*- coding: utf-8 -*-
+"""
+ARES-SPACE TRANSPORT V4.0 — Integrated Simulation & Report Generator
+Target Window: 2030 | Launch Site: Alcantara, Brazil
+Description: Combines the core systems physics with automated generator loops
+             to write updated BOM, Mass Breakdown, and Pitch files.
+"""
+import math
+import csv
+
+class AresSpaceTransportV4:
+    def __init__(self):
+        # === SOLAR THERMAL PROPULSION (STP) CONFIGURATION ===
+        self.SOLAR_CONSTANT_EARTH = 1361.0   # W/m²
+        self.MIRROR_AREA_PER_ENGINE = 1250.0 # m² per engine
+        self.OPTICAL_EFFICIENCY = 0.85       
+        self.ABSORBER_EFFICIENCY = 0.78      
+        self.R_METHANE = 518.3               # Specific gas constant for Methane (J/kg·K)
+        self.GAMMA_METHANE = 1.32            
+        self.G0 = 9.80665                    # m/s²
+        
+        self.ENGINE_COUNT = 2
+        self.THRUST_PER_STP_NOMINAL = 185000 # N (185 kN per engine at 1.0 AU)
+        self.TARGET_THRUST_N = self.THRUST_PER_STP_NOMINAL * self.ENGINE_COUNT
+        self.CHAMBER_PRESSURE = 5.5e6        # Pa
+        self.ALLOWABLE_STRESS = 180e6        # Pa
+        self.CHAMBER_COATING = "Iridium / Ta4HfC5 (Zero Corrosion)"
+        self.INTERNAL_RADIUS = 0.45          # m
+
+        # === PROP_MATRIX & ACTIVE ZERO BOIL-OFF (ZBO) ===
+        self.METHANE_DENSITY = 422.6         # kg/m³
+        self.TOTAL_PROPELLANT = 1130000      # kg (1,130.0 t LCH4)
+        self.CRYOCOOLER_EFFICIENCY_COP = 0.05
+        self.TANK_SURFACE_AREA = 565.0       # m²
+
+        # === EXPEDITION ROADMAP METRICS ===
+        self.LAUNCH_SITE = "Alcantara Space Center, Brazil (2.3°S)"
+        self.EARTH_BONUS = 463               # m/s
+        self.CREW_COUNT = 6
+        self.HABITAT_VOL = 380               # m³
+        
+        # Phase I: Lunar Round-Trip
+        self.LUNAR_PAYLOAD = 55000           # kg
+        self.LUNAR_DELTA_V_REAL = 8400.0     # m/s
+        self.LUNAR_DAYS = 28                 
+
+        # Phase II: Mars Transit
+        self.MARS_PAYLOAD = 71000            # kg
+        self.MARS_DELTA_V_REAL = 4200.0      # m/s
+        self.MARS_DAYS = 776                 
+
+        # === VEHICLE STRUCTURAL MASS BUDGET V4.0 ===
+        self.dry_mass = 120000               # kg (120.0 t - Nuclear weights removed)
+        self.tanks_mass = 75000              # kg (75.0 t - Compacted Al-Li structure)
+        self.launchpad_total_mass = self.dry_mass + self.TOTAL_PROPELLANT + self.tanks_mass
+
+    def calculate_stp_aerospike_physics(self, distance_au, mass_flow_rate_kg_s=15.0):
+        available_flux = self.SOLAR_CONSTANT_EARTH / (distance_au ** 2)
+        total_mirror_area = self.MIRROR_AREA_PER_ENGINE * self.ENGINE_COUNT
+        thermal_power_w = available_flux * total_mirror_area * self.OPTICAL_EFFICIENCY * self.ABSORBER_EFFICIENCY
+        
+        cp_methane = 3500.0
+        chamber_temp_k = 112.0 + (thermal_power_w / (mass_flow_rate_kg_s * cp_methane))
+        if chamber_temp_k > 3200.0:
+            chamber_temp_k = 3200.0
+
+        v_exhaust = math.sqrt((2 * self.GAMMA_METHANE / (self.GAMMA_METHANE - 1)) * self.R_METHANE * chamber_temp_k)
+        real_isp = v_exhaust / self.G0
+        real_thrust_n = mass_flow_rate_kg_s * v_exhaust
+        
+        stress_ratio = (self.ALLOWABLE_STRESS + self.CHAMBER_PRESSURE) / (self.ALLOWABLE_STRESS - self.CHAMBER_PRESSURE)
+        external_radius = self.INTERNAL_RADIUS * math.sqrt(stress_ratio)
+        wall_thickness = external_radius - self.INTERNAL_RADIUS
+        spike_mass = math.pi * (external_radius**2 - self.INTERNAL_RADIUS**2) * 3.5 * 1930 * self.ENGINE_COUNT
+        
+        return wall_thickness, spike_mass, real_isp, real_thrust_n, chamber_temp_k, thermal_power_w
+
+    def calculate_zbo_thermal_leak(self, days, distance_au):
+        external_thermal_flux = 400.0 / (distance_au ** 2)  
+        mli_transmittance = 0.001                            
+        heat_leak_watts = self.TANK_SURFACE_AREA * external_thermal_flux * mli_transmittance
+        electrical_power_watts = heat_leak_watts / self.CRYOCOOLER_EFFICIENCY_COP
+        energy_consumed_kwh = (electrical_power_watts / 1000.0) * 24.0 * days
+        return energy_consumed_kwh, electrical_power_watts / 1000.0
+
+    def evaluate_rocket_equation(self, payload_kg, delta_v_target, real_isp):
+        v_e = real_isp * self.G0
+        mass_initial = self.launchpad_total_mass + payload_kg
+        mass_final_required = mass_initial / math.exp(delta_v_target / v_e)
+        fuel_needed_kg = mass_initial - mass_final_required
+        margin_kg = self.TOTAL_PROPELLANT - fuel_needed_kg
+        viable = fuel_needed_kg <= self.TOTAL_PROPELLANT
+        return fuel_needed_kg, margin_kg, viable
     def generate_all_files(self):
         wall_t, spike_m, real_isp, thrust_n, tc_k, power_w = self.calculate_stp_aerospike_physics(distance_au=1.0)
         
